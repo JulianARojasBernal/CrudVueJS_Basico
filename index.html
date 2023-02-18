@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Crud Basico Vuejs</title>
+</head>
+<body>
+
+    <div class="container">
+
+        
+        <div class=" row y justify-content-center">
+            <h1 class="text-center"> Crud Basico <br> Registro de Pacientes: <br> Personas y Edades  </h1>
+        </div>
+
+        <br>
+        <br>
+        <div id="appPacientes" class="container">
+            <form class="">
+            <div class="mb-3">
+                <!-- Formulario para añadir pacientes -->
+                <section class="form">
+                    <form action="" class="text-center">
+                        <input v-model="nombre" @keyup.enter="crearPaciente" type="text" class="form-control" placeholder="Nombre Completo"> <br>
+                        <input v-model="edad" @keyup.enter="crearPaciente" type="number" name="edad" placeholder="Edad" class="form-control"> <br>
+                        <input v-model="enfermedad" @keyup.enter="crearPaciente" type="text" class="form-control" placeholder="Condición">
+                        <br>
+                        <!-- Botón para añadir -->
+                        <input @click="crearPaciente" type="button" value="Añadir" class="btn btn-success">
+                    </form>
+                </section>
+            </div> 
+        </form>
+            <!-- Tabla donde se muestran los datos -->
+            <section class="data">
+                <caption> <h1>Pacientes</h1></caption>
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">id</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Edad</th>
+                            <th scope="col">Condicion</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(paciente, index) in pacientes">
+                            <td>{{ paciente.id }}</td>
+                            <td>
+                                <span v-if="formActualizar && idActualizar == index">
+                                    <!-- Formulario para actualizar -->
+                                    <input v-model="nombreActualizar" type="text" class="form-control">
+                                </span>
+                                <span v-else>
+                                    <!-- Dato nombre -->
+                                    {{ paciente.nombre }}
+                                </span>
+                            </td>
+                            <td>
+                                <span v-if="formActualizar && idActualizar == index">
+                                    <!-- Formulario para actualizar -->
+                                    <input v-model="edadActualizar" type="text" class="form-control">
+                                </span>
+                                <span v-else>
+                                    <!-- Dato edad -->
+                                    {{ paciente.edad }}
+                                </span>
+                            </td>
+                            <td>
+                                <span v-if="formActualizar && idActualizar == index">
+                                    <!-- Formulario para actualizar -->
+                                    <input v-model="enfermedadActualizar" type="text" class="form-control">
+                                </span>
+                                <span v-else>
+                                    <!-- Dato enfermedad -->
+                                    {{ paciente.enfermedad }}
+                                </span>
+                            </td>
+                            <td>
+                                <!-- Botón para guardar la información actualizada -->
+                                <span v-if="formActualizar && idActualizar == index">
+                                    <button @click="guardarActualizacion(index)" class="btn btn-success">Guardar</button>
+                                </span>
+                                <span v-else>
+                                    <!-- Botón para mostrar el formulario de actualizar -->
+                                    <button @click="verFormActualizar(index)" class="btn btn-warning">Actualizar</button>
+                                    <!-- Botón para borrar -->
+                                    <button @click="borrarPaciente(index)" class="btn btn-danger">Borrar</button>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                new Vue({
+                    el: '#appPacientes',
+                    data: {
+                        // Input nombre
+                        nombre: '',
+                        // Input edad
+                        edad: '',
+                        // Input enfermedad
+                        enfermedad: '',
+                        // Ver o no ver el formulario de actualizar
+                        formActualizar: false,
+                        // La posición de tu lista donde te gustaría actualizar 
+                        idActualizar: -1,
+                        // Input nombre dentro del formulario de actualizar
+                        nombreActualizar: '',
+                        // Input edad dentro del formulario de actualizar
+                        edadActualizar: '',
+                        // Input enfermedad dentro del formulario de actualizar
+                        enfermedadActualizar: '',
+                        // Lista de pacientes
+                        pacientes: [] 
+                    },
+                    methods: {
+                        crearPaciente: function () {
+                            // Anyadimos a nuestra lista
+                            this.pacientes.push({
+                                id: + new Date(),
+                                nombre: this.nombre,
+                                edad: this.edad,
+                                enfermedad: this.enfermedad
+                            });
+                            // Vaciamos el formulario de añadir
+                            this.nombre = '';
+                            this.edad = '';
+                            this.enfermedad = '';
+                        },
+                        verFormActualizar: function (paciente_id) {
+                            // Antes de mostrar el formulario de actualizar, rellenamos sus campos
+                            this.idActualizar = paciente_id;
+                            this.nombreActualizar = this.pacientes[paciente_id].nombre;
+                            this.edadActualizar = this.pacientes[paciente_id].edad;
+                            this.enfermedadActualizar = this.pacientes[paciente_id].enfermedad;
+                            // Mostramos el formulario
+                            this.formActualizar = true;
+                        },
+                        borrarPaciente: function (paciente_id) {
+                            // Borramos de la lista
+                            this.pacientes.splice(paciente_id, 1);
+                        },
+                        guardarActualizacion: function (paciente_id) {
+                            // Ocultamos nuestro formulario de actualizar
+                            this.formActualizar = false;
+                            // Actualizamos los datos
+                            this.pacientes[paciente_id].nombre = this.nombreActualizar;
+                            this.pacientes[paciente_id].edad = this.edadActualizar;
+                            this.pacientes[paciente_id].enfermedad = this.enfermedadActualizar;
+                        }
+                    }
+                });
+            });
+        </script>
+    <br>
+    <br>
+    
+    <div class="card mb-3">
+        <img src="https://www.udgvirtual.udg.mx/sites/default/files/logo_udgvirtual_marca_registrada_grande.jpg" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h1 class="card-title">Optativa: Tópicos selectos de entornos de desarrollo: Frameworks</h1>
+          <h2 class="card-text"> Actividad INTEGRADORA: Crud en Vue.js</h2>
+          <h3 class="card-text"> Asesor: Marisol Flores Guerrero</h3>
+          <h3 class="card-text"> Alumno: Julián Arnulfo Rojas Bernal</h3>
+          
+        </div>
+      </div>
+
+    </div>
+
+
+</body>
+</html>
